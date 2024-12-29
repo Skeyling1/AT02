@@ -1,25 +1,15 @@
 import pytest
-from main import check
+from main import init_db, add_user, get_user
 
 
-def test_check():
-    assert check(6) == True
+@pytest.fixture
+def db_conn():
+    conn = init_db()
+    yield conn
+    conn.close()
 
 
-def test_check2():
-    assert check(3) == False
-
-
-@pytest.mark.parametrize("number, expected", [
-    (2, True),
-    (5, False),
-    (0, True),
-    (22, True),
-    (-8, True)
-])
-def test_check_with_param(number, expected):
-    assert check(number) == expected
-
-
-if __name__ == "__main__":
-    unittest.main()
+def test_add_or_get_user(db_conn):
+    add_user(db_conn, "Sasha", 30)
+    user = get_user(db_conn, "Sasha")
+    assert user == (1, "Sasha", 30)
